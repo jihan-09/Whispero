@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PointPro Ultra - Firewatch Dark</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #120905;
+    --card-bg: rgba(36, 18, 12, 0.75);
+    --card-border: rgba(255, 140, 0, 0.18);
+    --primary: #f77f00;
+    --primary-light: #fcbf49;
+    --accent-grad: linear-gradient(135deg, #f77f00 0%, #d62828 50%, #9b2226 100%);
+    --btn-grad: linear-gradient(135deg, #f77f00 0%, #fcbf49 100%);
+    --text-main: #fff3e6;
+    --text-muted: #d4a373;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  body {
+    background-color: var(--bg-color);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(247, 127, 0, 0.22) 0%, transparent 60%),
+      linear-gradient(to bottom, #120905, #080402);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 80px;
+  }
+
+  .app-container { width: 100%; max-width: 440px; padding: 16px; }
+
+  /* Welcome Header */
+  .welcome-title { font-size: 26px; font-weight: 800; margin-bottom: 16px; color: #fcbf49; }
+
+  /* 4 Grid Stats */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  }
+  .stat-icon { font-size: 24px; margin-bottom: 6px; }
+  .stat-val { font-size: 24px; font-weight: 800; line-height: 1.1; color: #ffffff; }
+  .stat-unit { font-size: 14px; font-weight: 700; color: #fcbf49; }
+  .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 6px; }
+
+  /* Section Title & Card */
+  .section-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    margin-bottom: 16px;
+  }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .section-title { font-size: 17px; font-weight: 800; color: #fcbf49; }
+
+  /* Toggle Filter Pill */
+  .filter-pill { display: flex; background: rgba(0, 0, 0, 0.4); padding: 3px; border-radius: 20px; border: 1px solid var(--card-border); }
+  .filter-btn { padding: 5px 12px; border-radius: 16px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-muted); background: transparent; }
+  .filter-btn.active { background: var(--primary); color: #120905; }
+
+  /* Leaderboard List */
+  .lb-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 140, 0, 0.08); }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-left { display: flex; align-items: center; gap: 10px; }
+  .lb-rank { font-size: 13px; font-weight: 800; color: var(--text-muted); width: 22px; }
+  .lb-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+  .lb-score { font-size: 14px; font-weight: 800; color: #fcbf49; }
+
+  /* Submit Form Cards */
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: #ffe8d6; }
+  .badge { font-size: 10px; background: rgba(247, 127, 0, 0.15); color: #fcbf49; padding: 3px 8px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(247, 127, 0, 0.2); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    background: rgba(18, 9, 5, 0.8);
+    border: 1.5px solid var(--card-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+  }
+  input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(247, 127, 0, 0.2); }
+
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; font-weight: 700; color: #ffe8d6; }
+  input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+  .btn-submit, .btn-edit {
+    width: 100%;
+    background: var(--btn-grad);
+    color: #120905;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    box-shadow: 0 6px 20px rgba(247, 127, 0, 0.3);
+  }
+  .btn-edit { background: rgba(255, 255, 255, 0.1); color: #fcbf49; border: 1px solid var(--card-border); margin-top: 12px; }
+
+  /* Profile Card */
+  .profile-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid var(--card-border);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    backdrop-filter: blur(12px);
+  }
+  .avatar {
+    width: 55px;
+    height: 55px;
+    background: rgba(247, 127, 0, 0.15);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    border: 2px solid var(--primary);
+  }
+  .p-name { font-size: 18px; font-weight: 800; line-height: 1.2; color: #fff; }
+  .p-tag { font-size: 12px; font-weight: 700; color: #fcbf49; margin: 3px 0; }
+  .p-inst { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+  /* Chart Box Fixes */
+  .chart-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 150px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 140, 0, 0.1);
+  }
+  .bar-group { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-end;
+    height: 100%;
+    flex: 1; 
+  }
+  .bar-value { 
+    font-size: 10px; 
+    font-weight: 800; 
+    color: #fcbf49; 
+    margin-bottom: 4px;
+    min-height: 14px;
+    text-align: center;
+  }
+  .bar { 
+    width: 16px; 
+    background: var(--accent-grad); 
+    border-radius: 4px; 
+    height: 6px; 
+    transition: height 0.3s ease; 
+  }
+  .bar-label { 
+    font-size: 10px; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    margin-top: 6px; 
+  }
+
+  /* Bottom Navigation Bar */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 440px;
+    background: #0d0603;
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -8px 25px rgba(0,0,0,0.5);
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 12px;
+  }
+  .nav-item.active { color: #120905; background: var(--primary); font-weight: 800; }
+  .nav-icon { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- TAB 1: HOME DASHBOARD -->
+  <div id="tabHome">
+    <div class="welcome-title">Welcome <span id="welcomeName">User</span>!</div>
+
+    <!-- 4 Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-val" id="statSelfStudy">0<span class="stat-unit">h 0m</span></div>
+        <div class="stat-label">Self Study This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-val" id="statTotalPts">0.0</div>
+        <div class="stat-label">Total Points This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏅</div>
+        <div class="stat-val" id="statRank">--</div>
+        <div class="stat-label">Ranked based on points</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-val" id="statSubmits">0</div>
+        <div class="stat-label">Total Task Submitted</div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Preview -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">Overall Leaderboard</div>
+        <div class="filter-pill">
+          <button class="filter-btn active" id="fPts" onclick="toggleLbFilter('pts')">Points</button>
+          <button class="filter-btn" id="fStudy" onclick="toggleLbFilter('study')">Study</button>
+        </div>
+      </div>
+      <div id="homeLeaderboard"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2: SUBMIT TASK -->
+  <div id="tabSubmit" style="display:none;">
+    <div class="welcome-title">Submit Daily Points</div>
+
+    <div class="section-card">
+      <div class="card-header"><span>1. Study Time</span><span class="badge">0.05 / min</span></div>
+      <div class="row">
+        <input type="number" id="hour" min="0" placeholder="Hours" oninput="validateInput(this)">
+        <input type="number" id="min" min="0" max="59" placeholder="Minutes" oninput="validateInput(this, 59)">
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="card-header"><span>2. Daily Exam Mark</span><span class="badge">0.5 / mark</span></div>
+      <input type="number" id="exam" min="0" placeholder="e.g. 17.5" oninput="validateInput(this)">
+    </div>
+
+    <div class="section-card">
+      <div class="card-header"><span>3. Per Namaz (Max 5)</span><span class="badge">1 pt / namaz</span></div>
+      <input type="number" id="namaz" min="0" max="5" placeholder="0 - 5" oninput="validateInput(this, 5)">
+    </div>
+
+    <div class="section-card">
+      <div class="toggle-row">
+        <span>4. Quran Reading (+2 pts)</span>
+        <input type="checkbox" id="quran">
+      </div>
+      <div class="toggle-row">
+        <span>5. Exercise (+2 pts)</span>
+        <input type="checkbox" id="ex">
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitData()">Submit Today's Task</button>
+  </div>
+
+  <!-- TAB 3: PROFILE & CHART -->
+  <div id="tabProfile" style="display:none;">
+    <div class="profile-card">
+      <div class="avatar">👤</div>
+      <div>
+        <div class="p-name" id="dispName">Your Full Name</div>
+        <div class="p-tag" id="dispTag">HSC 2026 • Science</div>
+        <div class="p-inst" id="dispInst">Your School / College Name</div>
+      </div>
+    </div>
+
+    <button class="btn-edit" onclick="openEditProfile()">✏️ Edit Profile Details</button>
+
+    <div class="section-card" style="margin-top: 16px;">
+      <div class="section-title" style="margin-bottom:12px;">This Week's Points Chart</div>
+      <div class="chart-box">
+        <div class="bar-group">
+          <span class="bar-value" id="val-sat">0pt</span>
+          <div class="bar" id="bar-sat"></div>
+          <span class="bar-label">Sat</span>
+        </div>
+        <div class="bar-group">
+          <span class="bar-value" id="val-sun">0pt</span>
+          <div class="bar" id="bar-sun"></div>
+          <span class="bar-label">Sun</span>
+        </div>
+        <div class="bar-group">
+          <span class="bar-value" id="val-mon">0pt</span>
+          <div class="bar" id="bar-mon"></div>
+          <span class="bar-label">Mon</span>
+        </div>
+        <div class="bar-group">
+          <span class="bar-value" id="val-tue">0pt</span>
+          <div class="bar" id="bar-tue"></div>
+          <span class="bar-label">Tue</span>
+        </div>
+        <div class="bar-group">
+          <span class="bar-value" id="val-wed">0pt</span>
+          <div class="bar" id="bar-wed"></div>
+          <span class="bar-label">Wed</span>
+        </div>
+        <div class="bar-group">
+          <span class="bar-value" id="val-thu">0pt</span>
+          <div class="bar" id="bar-thu"></div>
+          <span class="bar-label">Thu</span>
+        </div>
+        <div class="bar-group">
+          <span class="bar-value" id="val-fri">0pt</span>
+          <div class="bar" id="bar-fri"></div>
+          <span class="bar-label">Fri</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav">
+  <button class="nav-item active" id="nHome" onclick="switchNav('home')">
+    <span class="nav-icon">🏠</span>Home
+  </button>
+  <button class="nav-item" id="nSubmit" onclick="switchNav('submit')">
+    <span class="nav-icon">📝</span>Submit
+  </button>
+  <button class="nav-item" id="nProfile" onclick="switchNav('profile')">
+    <span class="nav-icon">👤</span>Profile
+  </button>
+</div>
+
+<script>
+  var currentFilter = 'pts';
+  var userSubmits = 0;
+  var userTotalMins = 0;
+  var userTotalPts = 0;
+
+  var profileData = {
+    name: "User",
+    fullName: "Your Full Name",
+    tag: "HSC 2026 • Science",
+    institution: "Your School / College Name"
+  };
+
+  var leaderboardData = [];
+
+  function validateInput(el, maxLimit) {
+    if (!el.value) return;
+    var val = parseFloat(el.value);
+    if (isNaN(val) || val < 0) el.value = 0;
+    if (maxLimit !== undefined && val > maxLimit) el.value = maxLimit;
+  }
+
+  function getCleanVal(id) {
+    var el = document.getElementById(id);
+    if (!el || !el.value) return 0;
+    var val = parseFloat(el.value);
+    return isNaN(val) || val < 0 ? 0 : val;
+  }
+
+  function submitData() {
+    var h = getCleanVal('hour');
+    var m = getCleanVal('min');
+    var mins = (h * 60) + m;
+    var studyPts = mins * 0.05;
+
+    var examPts = getCleanVal('exam') * 0.5;
+    var namazPts = getCleanVal('namaz') * 1;
+
+    var quranPts = document.getElementById('quran').checked ? 2 : 0;
+    var exPts = document.getElementById('ex').checked ? 2 : 0;
+
+    var total = studyPts + examPts + namazPts + quranPts + exPts;
+
+    if (total === 0) {
+      alert('Please enter your activities to submit!');
+      return;
+    }
+
+    userSubmits++;
+    userTotalMins += mins;
+    userTotalPts += total;
+
+    var hrs = Math.floor(userTotalMins / 60);
+    var remMins = userTotalMins % 60;
+    document.getElementById('statSelfStudy').innerHTML = hrs + '<span class="stat-unit">h ' + remMins + 'm</span>';
+    document.getElementById('statTotalPts').innerText = userTotalPts.toFixed(1);
+    document.getElementById('statSubmits').innerText = userSubmits;
+
+    var found = false;
+    for (var i = 0; i < leaderboardData.length; i++) {
+      if (leaderboardData[i].name === profileData.name) {
+        leaderboardData[i].points = userTotalPts;
+        leaderboardData[i].studyHours = (userTotalMins / 60);
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      leaderboardData.push({ name: profileData.name, points: userTotalPts, studyHours: (userTotalMins / 60) });
+    }
+
+    updateChart(total);
+
+    alert('Task submitted successfully!');
+
+    document.getElementById('hour').value = '';
+    document.getElementById('min').value = '';
+    document.getElementById('exam').value = '';
+    document.getElementById('namaz').value = '';
+    document.getElementById('quran').checked = false;
+    document.getElementById('ex').checked = false;
+
+    switchNav('home');
+  }
+
+  function updateChart(points) {
+    var heightPx = Math.min(80, Math.max(12, points * 4));
+    var todayIdx = new Date().getDay();
+    var dayMap = {6: 'sat', 0: 'sun', 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri'};
+    var dayKey = dayMap[todayIdx] || 'sat';
+    
+    var barEl = document.getElementById('bar-' + dayKey);
+    var valEl = document.getElementById('val-' + dayKey);
+    
+    if(barEl) barEl.style.height = heightPx + 'px';
+    if(valEl) valEl.innerText = points.toFixed(1) + 'pt';
+  }
+
+  function openEditProfile() {
+    var newName = prompt("Enter Short Name (Displayed on Dashboard & Leaderboard):", profileData.name);
+    if(newName === null) return;
+    var newFull = prompt("Enter Full Name:", profileData.fullName);
+    if(newFull === null) return;
+    var newTag = prompt("Enter Batch & Group (e.g. HSC 2026 • Science):", profileData.tag);
+    if(newTag === null) return;
+    var newInst = prompt("Enter College / Institution Name:", profileData.institution);
+    if(newInst === null) return;
+
+    var oldName = profileData.name;
+    profileData.name = newName.trim() || profileData.name;
+    profileData.fullName = newFull.trim() || profileData.fullName;
+    profileData.tag = newTag.trim() || profileData.tag;
+    profileData.institution = newInst.trim() || profileData.institution;
+
+    for (var i = 0; i < leaderboardData.length; i++) {
+      if (leaderboardData[i].name === oldName) {
+        leaderboardData[i].name = profileData.name;
+      }
+    }
+
+    document.getElementById('welcomeName').innerText = profileData.name;
+    document.getElementById('dispName').innerText = profileData.fullName;
+    document.getElementById('dispTag').innerText = profileData.tag;
+    document.getElementById('dispInst').innerText = profileData.institution;
+
+    alert('Profile updated successfully!');
+    renderLeaderboard();
+  }
+
+  function toggleLbFilter(type) {
+    currentFilter = type;
+    document.getElementById('fPts').className = 'filter-btn' + (type === 'pts' ? ' active' : '');
+    document.getElementById('fStudy').className = 'filter-btn' + (type === 'study' ? ' active' : '');
+    renderLeaderboard();
+  }
+
+  function renderLeaderboard() {
+    if (currentFilter === 'pts') {
+      leaderboardData.sort(function(a, b) { return b.points - a.points; });
+    } else {
+      leaderboardData.sort(function(a, b) { return b.studyHours - a.studyHours; });
+    }
+
+    var container = document.getElementById('homeLeaderboard');
+    container.innerHTML = '';
+
+    if(leaderboardData.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:13px; font-weight:600;">No submissions yet. Submit your task to appear here!</div>';
+      document.getElementById('statRank').innerText = '--';
+      return;
+    }
+
+    var userRankFound = false;
+    leaderboardData.forEach(function(item, idx) {
+      if (item.name === profileData.name) {
+        document.getElementById('statRank').innerText = '#' + (idx + 1);
+        userRankFound = true;
+      }
+
+      var div = document.createElement('div');
+      div.className = 'lb-row';
+      var scoreTxt = currentFilter === 'pts' ? item.points.toFixed(2) : item.studyHours.toFixed(1) + ' hrs';
+      div.innerHTML = '<div class="lb-left"><div class="lb-rank">#' + (idx + 1) + '</div><div class="lb-name">' + item.name + '</div></div><div class="lb-score">' + scoreTxt + '</div>';
+      container.appendChild(div);
+    });
+
+    if(!userRankFound) {
+      document.getElementById('statRank').innerText = '--';
+    }
+  }
+
+  function switchNav(tab) {
+    document.getElementById('tabHome').style.display = (tab === 'home') ? 'block' : 'none';
+    document.getElementById('tabSubmit').style.display = (tab === 'submit') ? 'block' : 'none';
+    document.getElementById('tabProfile').style.display = (tab === 'profile') ? 'block' : 'none';
+
+    document.getElementById('nHome').className = 'nav-item' + (tab === 'home' ? ' active' : '');
+    document.getElementById('nSubmit').className = 'nav-item' + (tab === 'submit' ? ' active' : '');
+    document.getElementById('nProfile').className = 'nav-item' + (tab === 'profile' ? ' active' : '');
+
+    if (tab === 'home') renderLeaderboard();
+  }
+
+  renderLeaderboard();
+</script>
+
+</body>
+  </html>
+                                 
